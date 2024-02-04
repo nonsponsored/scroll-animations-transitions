@@ -1,0 +1,455 @@
+<!DOCTYPE html>
+<html lang="en" dir="ltr">
+    <head>
+		<meta charset="utf-8">
+		<meta name="viewport" content="width=device-width,initial-scale=1">
+		<link rel="preconnect" href="https://fonts.googleapis.com"> 
+		<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin> 
+		<link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300&display=swap" rel="stylesheet">
+		<title>Scroll-triggered Animations & Transitions</title>
+		<style>
+			/* PAGE STYLING */
+			:root {
+				--dark: #000;
+				--light: #fff;
+			}
+			* {
+				box-sizing: border-box;
+			}
+			html {
+				height: 100%;
+			}
+			body {
+				font-family: 'Helvetica Neue', sans-serif;
+				line-height: 1;
+				margin: 0;
+				min-height: 100%;
+				vertical-align: baseline;
+			}
+			button {
+				background: none;
+				border: none;
+				color: inherit;
+				cursor: pointer;
+				font-family: inherit;
+				font-size: 1.25rem;
+				line-height: inherit;
+				padding: 0;
+			}
+			header {
+				background-color: #f3f3f3;
+				border-block-end: 1px solid #c3c3c3;
+				margin-block-end: 50px;
+				padding-block: 5px;
+				padding-inline: 10px;
+			}
+			main {
+				padding-block-end: 50vh;
+			}
+			.text-block {
+				line-height: 1.4;
+				max-width: 75ch;
+				padding-inline: 10px;
+
+				ul {
+					padding-inline-start: 20px;
+				}
+
+				li {
+					padding-block-end: 10px;
+				}
+			}
+			/* END PAGE STYLING */
+
+
+			/* DEMO STYLES */
+			.demo {
+				margin-block-start: 100vh;
+				padding-inline: 1rem;
+			}
+			.demo h2 {
+				margin-block: 0 1rem;
+				padding-block: 0.5rem;
+			}
+			.demo h3 {
+				font-family: 'Poppins';
+				font-size: 92px;
+				font-weight: normal;
+				line-height: 1.3;
+				letter-spacing: -.01em;
+				margin-block-start: 0;
+				max-width: 30ch;
+				word-break: break-word;
+			}
+			.demo p {
+				line-height: 1.4;
+				margin-block: 0 2rem;
+				max-width: 75ch;
+			}
+			.demo p::after {
+				background-color: #313131;
+				content: '';
+				display: block;
+				height: 1px;
+				margin-block: 1rem 0;
+				width: calc(100vw - 2rem);
+			}
+			.demo img {
+				border-radius: 0.5rem;
+				display: block;
+				height: auto;
+				max-width: 100%;
+			}
+			
+			/* Animations & Transitions: only if no reduced motion preference set */
+			@media (prefers-reduced-motion: no-preference) {
+				/* ANIMATION STYLES: Set up variables for 'animate--' class */
+				[class*='animate--'] {
+					--easing: ease-in-out;
+					--fade-in: fade-in var(--duration) var(--easing);
+					--slide-left: slide-left var(--duration) var(--easing);
+					--slide-right: slide-right var(--duration) var(--easing);
+					--wipe-down: wipe-down var(--duration) var(--easing);
+					--wipe-left: wipe-left var(--duration) var(--easing);
+					--wipe-right: wipe-right var(--duration) var(--easing);
+					
+					/* Setting to 0 opacity and adding transition, so when you scroll back up, the content fades back out.*/
+					opacity: 0;
+					transition: opacity 350ms;
+				}
+				/* Class to trigger animation */
+				.play-animation {
+					--duration: 750ms;
+
+					/* When class is added, immediately change opacity. */
+					opacity: 1;
+					transition-duration: 0ms;
+				}
+				.animate--wipe-left {
+					animation: var(--wipe-left);
+				}
+				.animate--wipe-left-fade {
+					animation: var(--fade-in), var(--wipe-left);
+				}
+				.animate--wipe-right {
+					animation: var(--wipe-right);
+				}
+				.animate--wipe-right-fade {
+					animation: var(--fade-in), var(--wipe-right);
+				}
+				.animate--slide-left-fade {
+					animation: var(--fade-in), var(--slide-left);
+				}
+				.animate--slide-right-fade {
+					animation: var(--fade-in), var(--slide-right);
+				}
+				.animate--wipe-down-fade {
+					animation: var(--fade-in), var(--wipe-down);
+				}
+				@keyframes fade-in {
+					from {
+						opacity: 0;
+					}
+
+					to {
+						opacity: 1;
+					}
+				}
+				@keyframes slide-left {
+					from {
+						transform: translateX(5%);
+					}
+
+					to {
+						transform: translateX(0);
+					}
+				}
+				@keyframes slide-right {
+					from {
+						transform: translateX(-5%);
+					}
+
+					to {
+						transform: translateX(0);
+					}
+				}
+				@keyframes wipe-down {
+					from {
+						clip-path: inset( 0 0 100% 0);
+					}
+
+					to {
+						clip-path: inset(0 0 0 0);
+					}
+				}
+				@keyframes wipe-left {
+					0% {
+						clip-path: inset(0 0 -5% 100%);
+					}
+
+					100% {
+						clip-path: inset(0 0 -5% 0);
+					}
+				}
+				@keyframes wipe-right {
+					from {
+						clip-path: inset(0 100% -5% 0);
+					}
+
+					to {
+						clip-path: inset(0 0 -5% 0);
+					}
+				}
+				
+				
+				/* ANIMATION TIMELINE STYLE: only if browser supports it  */
+				@supports (animation-timeline: scroll()) {
+					.scroll-fill {
+						view-timeline-name: --scroll-fill;
+					}
+					.scroll-fill > span {
+						/* Inline element is required for text to fill this way */
+						background-clip: text;
+						background-image: linear-gradient(var(--dark) 0, var(--dark) 100%);
+						background-repeat: no-repeat;
+						background-size: 0% 100%;
+						animation-name: fill-in;
+						animation-fill-mode: forwards;
+						animation-timing-function: linear;
+						animation-timeline: --scroll-fill;
+						/* Trigger animation when 50% of element is in viewport and animate until center of element reaches 50% of viewport height, then do nothing. */
+						animation-range: entry 50% cover 50%, cover 50% exit 0%;
+						-webkit-text-fill-color: rgba(0,0,0,0.25);
+					}
+				}
+				@keyframes fill-in {
+					to {
+						background-size: 100% 100%;
+					}
+				}
+
+
+				/* TRANSITION STYLES: Set up variables for 'animate--' class */
+				.transition--fill > span {
+					/* Inline element is required for text to fill this way */
+					background-clip: text;
+					background-image: linear-gradient(black 0, black 100%);
+					background-repeat: no-repeat;
+					background-size: 0% 100%;
+					display: inline;
+					transition: background-size calc(var(--duration) + 500ms);
+					-webkit-text-fill-color: rgba(0,0,0,0.25);
+				}
+				.transition--wipe-left {
+					clip-path: inset(0 0 -5% 100%);
+					transition: clip-path var(--duration);
+				}
+				/* Class to trigger transition */
+				.play-transition,
+				.reverse-transition {
+					--duration: 750ms;
+				}
+				.play-transition.transition--wipe-left {
+					clip-path: inset(0 0 -5% 0);
+				}
+				.play-transition.transition--fill >  span {
+					background-size: 100% 100%;
+				}
+				/* Class to reverse transition */
+				.reverse-transition > span {
+					background-size: 0% 100%;
+				}
+				/* END DEMO STYLES */
+			}
+		</style>
+    </head>
+    
+    <body>
+		<header>
+			<img src="https://raw.githubusercontent.com/nonsponsored/component-lottie/main/assets/logo-m4m5.svg" width="45" height="34" alt="M4M5 Logo" />
+		</header>
+
+		<main>
+			<div class="text-block">
+				<h1>Scroll-triggered Animations & Transitions</h1>
+				<h2>Details</h2>
+				<ul>
+					<li>Examples of CSS animations and transitions controlled by IntersectionObserver and Animation Timeline.</li>
+					<li>The animation-timeline Scroll Fill demo requires no JS, and shows how the effect is controlled by scrolling.</li>
+					<li>prefers-reduced-motion is honored and will render the static elements.</li>
+					<li>CSS is structured to show how multiple animations can be combined.</li>
+				</ul>
+
+				<h2>Considerations</h2>
+				<ul>
+					<li>animation-timeline is only supported in Chrome, Edge, and Opera, while it's available behind a flag in Firefox.</li>
+					<li>For progressive enhancement, animation-timeline Scroll Fill demo could fall back to the Transition Fill demo by sharing CSS and using `if (!CSS.supports('animation-timeline: --works')) {...}` to initialize the IntersectionObserver</li>
+					<li>For the Transition Wipe Left demo, CSS Transition is used instead of CSS Animation, due to the latter having challenges with reversing an animation via toggled classes.</li>
+				</ul>
+
+				<h2>Demo</h2>
+				<p>There are ten demos below. One is CSS Animation using animation-timeline, two are CSS Transitions using IntersectionObserver, and seven are CSS Animations using IntersectionObserver.</p>
+			</div>
+
+			
+			<section class="demo">
+				<h2>Demo: Transition Fill</h2>
+				<p>Text color auto-fills from gray to black when entering viewport, remains black when scrolled off top of viewport, and reverses from black to gray when scrolled off bottom of viewport.</p>
+				<h3 class="transition--fill">
+					<!-- Inline element is required for text to fill this way -->
+					<span>Emphasizing the value of lifelong service to our communities.</span>
+				</h3>
+			</section>
+
+			<section class="demo">
+				<h2>Demo: animation-timeline Scroll Fill</h2>
+				<p>Text color fills from gray to black, based on your scroll, when entering viewport, and reverses from black to gray when scrolling down.</p>
+				<h3 class="scroll-fill">
+					<!-- Inline element is required for text to fill this way -->
+					<span>Emphasizing the value of lifelong service to our communities.</span>
+				</h3>
+			</section>
+			
+			<section class="demo">
+				<h2>Demo: Transition Wipe Left</h2>
+				<p>Elements wipe from right to left when entering viewport, remain visible when scrolled off top of viewport, and wipe from left to right when scrolled off bottom of viewport. CSS Transition is used instead of CSS Animation, due to the latter having challenges with reversing an animation via toggled classes.</p>
+				<h3 class="transition--wipe-left">Emphasizing the value of lifelong service to our communities.</h3>
+				<img class="transition--wipe-left" src="assets/astronaut.jpg" width="480" height="667" alt="Astronaut" />
+			</section>
+
+			<section class="demo">
+				<h2>Demo: Animation Wipe Left</h2>
+				<p>Elements wipe from right to left when entering viewport, remain visible when scrolled off top of viewport, and fade out when scrolled off bottom of viewport.</p>
+				<h3 class="animate--wipe-left">Emphasizing the value of lifelong service to our communities.</h3>
+				<img class="animate--wipe-left" src="assets/astronaut.jpg" width="480" height="667" alt="Astronaut" />
+			</section>
+			
+			<section class="demo">
+				<h2>Demo: Animation Wipe Left & Fade-in</h2>
+				<p>Elements wipe from right to left and fade-in when entering viewport, remain visible when scrolled off top of viewport, and fade out when scrolled off bottom of viewport.</p>
+				<h3 class="animate--wipe-left-fade">Emphasizing the value of lifelong service to our communities.</h3>
+				<img class="animate--wipe-left-fade" src="assets/astronaut.jpg" width="480" height="667" alt="Astronaut" />
+			</section>
+
+			<section class="demo">
+				<h2>Demo: Animation Wipe Right</h2>
+				<p>Elements wipe from left to right when entering viewport, remain visible when scrolled off top of viewport, and fade out when scrolled off bottom of viewport.</p>
+				<h3 class="animate--wipe-right">Emphasizing the value of lifelong service to our communities.</h3>
+				<img class="animate--wipe-right" src="assets/astronaut.jpg" width="480" height="667" alt="Astronaut" />
+			</section>
+
+			<section class="demo">
+				<h2>Demo: Animation Wipe Right & Fade-in</h2>
+				<p>Elements wipe from left to right and fade-in when entering viewport, remain visible when scrolled off top of viewport, and fade out when scrolled off bottom of viewport.</p>
+				<h3 class="animate--wipe-right-fade">Emphasizing the value of lifelong service to our communities.</h3>
+				<img class="animate--wipe-right-fade" src="assets/astronaut.jpg" width="480" height="667" alt="Astronaut" />
+			</section>
+
+			<section class="demo">
+				<h2>Demo: Animation Slide Left & Fade-in</h2>
+				<p>Elements slide from right to left and fade-in when entering viewport, remain visible when scrolled off top of viewport, and fade out when scrolled off bottom of viewport.</p>
+				<h3 class="animate--slide-left-fade">Emphasizing the value of lifelong service to our communities.</h3>
+				<img class="animate--slide-left-fade" src="assets/astronaut.jpg" width="480" height="667" alt="Astronaut" />
+			</section>
+
+			<section class="demo">
+				<h2>Demo: Animation Slide Right & Fade-in</h2>
+				<p>Elements slide from left to right and fade-in when entering viewport, remain visible when scrolled off top of viewport, and fade out when scrolled off bottom of viewport.</p>
+				<h3 class="animate--slide-right-fade">Emphasizing the value of lifelong service to our communities.</h3>
+				<img class="animate--slide-right-fade" src="assets/astronaut.jpg" width="480" height="667" alt="Astronaut" />
+			</section>
+
+			<section class="demo">
+				<h2>Demo: Animation Wipe Down & Fade-in</h2>
+				<p>Elements wipe from top to bottom and fade-in when entering viewport, remain visible when scrolled off top of viewport, and fade out when scrolled off bottom of viewport.</p>
+				<h3 class="animate--wipe-down-fade">Emphasizing the value of lifelong service to our communities.</h3>
+				<img class="animate--wipe-down-fade" src="assets/astronaut.jpg" width="480" height="667" alt="Astronaut" />
+			</section>
+		</main>
+
+		<script>
+			if (window.matchMedia('(prefers-reduced-motion: no-preference)').matches) {
+				/* IntersectionObserver for the Animations */
+				class Animate {
+					container
+			
+					constructor(itemContainer) {
+						// Check for container and initialized
+						if (!itemContainer || itemContainer.inited) {
+							return
+						}
+						itemContainer.inited = true
+			
+						this.container = itemContainer
+
+						this.observer = new IntersectionObserver(
+							(entries) => {
+								entries.forEach((entry) => {
+									if (entry.isIntersecting) {
+										this.container.classList.add('play-animation');
+									} else {
+										this.container.classList.remove('play-animation');
+									}
+								})
+							},
+							{ rootMargin: '100% 0% -25% 0%' } // Trigger when 100% exited off the top, and when 25% off the bottom
+						);
+
+						// Initialize observer
+						this.observer.observe(this.container)
+					}
+				}
+				document.querySelectorAll('[class*="animate--"]').forEach((item) => {
+					new Animate(item)
+				})
+
+
+				/* IntersectionObserver for the Transitions */
+				/* Separated from Animation to make it easier to see how the reverse class is handled. */
+				class Transition {
+					container
+			
+					constructor(itemContainer) {
+						// Check for container and initialized
+						if (!itemContainer || itemContainer.inited) {
+							return
+						}
+						itemContainer.inited = true
+			
+						this.container = itemContainer
+
+						this.observer = new IntersectionObserver(
+							(entries) => {
+								entries.forEach((entry) => {
+									if (entry.isIntersecting) {
+										this.container.classList.add('play-transition');
+
+										// Check if scrolling up and remove reverse class
+										if (entry.boundingClientRect.top > entry.rootBounds.top) {
+											this.container.classList.remove('reverse-transition');
+										}
+									} else {
+										// If play-transition is set, add reverse class
+										if (this.container.classList.contains('play-transition')) {
+											this.container.classList.add('reverse-transition');
+										}
+										this.container.classList.remove('play-transition');
+									}
+
+									
+								})
+							},
+							{ rootMargin: '100% 0% -25% 0%' } // Trigger when 100% exited off the top, and when 25% off the bottom
+						);
+
+						// Initialize observer
+						this.observer.observe(this.container)
+					}
+				}
+				document.querySelectorAll('[class*="transition--"]').forEach((item) => {
+					new Transition(item)
+				})
+			}
+		</script>
+	</body>
+</html>
