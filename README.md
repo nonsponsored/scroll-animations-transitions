@@ -1,7 +1,7 @@
 <h1>Scroll-triggered Animations & Transitions</h1>
 <h2>Details</h2>
 <ul>
-  <li>Examples of CSS animations and transitions controlled by IntersectionObserver and Animation Timeline.</li>
+  <li>Examples of CSS animations and transitions controlled by IntersectionObserver and animation-timeline.</li>
   <li>The animation-timeline Scroll Fill demo requires no JS, and shows how the effect is controlled by scrolling.</li>
   <li>prefers-reduced-motion is honored and will render the static elements.</li>
   <li>CSS is structured to show how multiple animations can be combined.</li>
